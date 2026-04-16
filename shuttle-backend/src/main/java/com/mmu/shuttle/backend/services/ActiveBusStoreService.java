@@ -1,0 +1,179 @@
+package com.mmu.shuttle.backend.services;
+
+import com.mmu.shuttle.backend.caches.ActiveBusStore;
+import com.mmu.shuttle.backend.caches.RouteCache;
+import com.mmu.shuttle.backend.entities.Route;
+import com.mmu.shuttle.backend.entities.RouteStation;
+import com.mmu.shuttle.backend.entities.Station;
+import com.mmu.shuttle.backend.exceptions.ResourceNotFoundException;
+import com.mmu.shuttle.backend.models.ActiveBusModel;
+import com.mmu.shuttle.backend.models.ActiveBusRequest;
+import com.mmu.shuttle.backend.models.BusLocationModel;
+import com.mmu.shuttle.backend.models.LocationModel;
+import com.mmu.shuttle.backend.securities.DriverDetail;
+import com.mmu.shuttle.backend.utils.GeoUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class ActiveBusStoreService {
+
+    @Autowired
+    private ActiveBusStore activeBusStore;
+
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
+
+    @Autowired
+    private RouteCache routeCache;
+
+    @Autowired
+    private AuthService authService;
+
+    public ActiveBusModel startRide(ActiveBusRequest activeBusRequest,Authentication authentication) {
+        Long routeId = activeBusRequest.getRouteId();
+
+        if (routeId == null) {
+            throw new ResourceNotFoundException("Route Id is null");
+        }
+
+       String busPlate = authService.getBusPlateFromAuth(authentication);
+
+        if(busPlate == null){
+            throw new AuthorizationDeniedException("Invalid Credentials");
+        }
+
+        Route route = routeCache.getRoute(routeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Route with id " + routeId + " is not found in cache"));
+
+        Long nextStationId = route.getRouteStations().stream()
+                .filter(station -> 1 == station.getSequence())
+                .findFirst()
+                .map(station -> station.getStation().getId())
+                .orElse(null);
+
+        if(nextStationId == null){
+            throw new ResourceNotFoundException("Next Station is Unknown");
+        }
+
+        LocationModel locationModel = activeBusRequest.getLocation();
+        if (locationModel == null) {
+            throw new ResourceNotFoundException("Location is null");
+        }
+
+        ActiveBusModel activeBusModel = activeBusStore.addActiveBus(routeId, busPlate, locationModel.getLongitude(), locationModel.getLatitude(), nextStationId);
+        simpMessagingTemplate.convertAndSend("/routes/active_buses/" + routeId, activeBusModel);
+        return activeBusModel;
+    }
+
+    public void endRide(Long routeId,Authentication authentication) {
+        String busPlate = authService.getBusPlateFromAuth(authentication);
+
+        if(busPlate == null){
+            throw new AuthorizationDeniedException("Invalid Credentials");
+        }
+
+        ActiveBusModel activeBusModel = activeBusStore.removeActiveBus(routeId, busPlate);
+        if (activeBusModel != null) {
+            simpMessagingTemplate.convertAndSend("/routes/active_buses/" + routeId, activeBusModel);
+        }
+    }
+
+    public List<ActiveBusModel> getActiveBusesByRouteId(Long routeId) {
+        return activeBusStore.getActiveBusesByRouteId(routeId);
+    }
+
+    public void updateBusLocation(BusLocationModel busLocationModel, Authentication authentication) {
+
+        String busPlate = authService.getBusPlateFromAuth(authentication);
+
+        Long routeId = busLocationModel.getRouteId();
+        LocationModel newLocation = busLocationModel.getLocation();
+
+        ActiveBusModel activeBusModel = activeBusStore.updateBusLocation(routeId, busPlate, newLocation);
+        if (activeBusModel == null) return;
+
+        Route route = routeCache.getRoute(routeId).orElse(null);
+        checkAndAdvanceStation(route, activeBusModel, newLocation);
+        simpMessagingTemplate.convertAndSend("/routes/active_buses/" + routeId, activeBusModel);
+    }
+
+    private void checkAndAdvanceStation(Route route, ActiveBusModel activeBusModel, LocationModel newLocation) {
+        if (route == null || activeBusModel == null || activeBusModel.getNextBusStationId() == null) {
+            return;
+        }
+
+        List<RouteStation> stations = route.getRouteStations();
+        long currentExpectedSequence = activeBusModel.getNextSequence();
+
+        RouteStation physicallyReachedStation = null;
+        double minDistance = Double.MAX_VALUE;
+
+        for (RouteStation rs : stations) {
+            if (rs.getStation() != null && rs.getSequence() >= currentExpectedSequence) {
+                double distance = GeoUtils.calculateDistanceInMeters(
+                        newLocation.getLatitude(), newLocation.getLongitude(),
+                        rs.getStation().getLatitude(), rs.getStation().getLongitude()
+                );
+
+                if (distance <= 50.0 && distance < minDistance) {
+                    minDistance = distance;
+                    physicallyReachedStation = rs;
+                }
+            }
+        }
+
+        if (physicallyReachedStation != null) {
+            long reachedSequence = physicallyReachedStation.getSequence();
+            int targetSequence = -1;
+
+            // Find the next available sequence number
+            for (RouteStation rs : stations) {
+                if (rs.getSequence() > reachedSequence) {
+                    if (targetSequence == -1 || rs.getSequence() < targetSequence) {
+                        targetSequence = rs.getSequence();
+                    }
+                }
+            }
+
+            activeBusModel.setNextSequence(targetSequence);
+
+            if (targetSequence == -1) {
+                activeBusModel.setNextBusStationId(null);
+            } else {
+                Long targetStationId = null;
+                for (RouteStation rs : stations) {
+                    if (rs.getSequence() == targetSequence) {
+                        targetStationId = rs.getStation().getId();
+                        break;
+                    }
+                }
+                activeBusModel.setNextBusStationId(targetStationId);
+            }
+
+        }
+    }
+
+    public Long getDriverActiveBusRouteId(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication.getPrincipal().equals("anonymousUser")) {
+            return null;
+        }
+
+        DriverDetail driverDetail = (DriverDetail) authentication.getPrincipal();
+        ActiveBusModel activeBusModel = activeBusStore.getActiveBusByBusPlate(driverDetail.getBusPlate());
+        if (activeBusModel == null) return null;
+
+        return activeBusModel.getRouteId();
+    }
+
+
+    public void clearActiveBuses() {
+        activeBusStore.resetAll();
+    }
+}
