@@ -1,7 +1,7 @@
 services:
   shuttle-backend:
     build: ./shuttle-backend
-    container_name: spring-backend
+    # Removed container_name for better scaling/compatibility
     restart: unless-stopped
     expose:
       - "8080"
@@ -19,7 +19,7 @@ services:
 
   postgres-db:
     image: postgres:15-alpine
-    container_name: postgres-db
+    # Removed container_name
     restart: unless-stopped
     expose:
       - "5432"
@@ -38,13 +38,15 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin
+    # Removed container_name
     restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PG_USERNAME}
       PGADMIN_DEFAULT_PASSWORD: ${PG_PASSWORD}
       PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "True"
       PGADMIN_LISTEN_PORT: 80
+    # If the platform uses a Load Balancer, consider removing 'ports' and 
+    # letting the platform handle the ingress mapping.
     ports:
       - "5050:80"
     depends_on:
@@ -59,7 +61,7 @@ services:
         - VITE_GOOGLE_MAPS_ID=${VITE_GOOGLE_MAPS_ID}
         - VITE_API_URL=${VITE_API_URL}
         - VITE_WEB_SOCKET_URL=${VITE_WEB_SOCKET_URL}
-    container_name: nginx
+    # Removed container_name
     ports:
       - "80:80"
       - "443:443"
