@@ -1,0 +1,103 @@
+import { useState } from 'react';
+import type { StationAccordianProps } from '../interfaces/props/StationAccordianProps';
+import Schedule from './Schedule';
+import BusArrivalTimeCard from './BusArrivalTimeCard';
+import BusIcon from './BusIcon';
+import { Skeleton } from "@mui/material";
+import Alert from "./Alert";
+
+const StationAccordian = ({ stations, activeBuses, isLoading, isError, errorMessage }: StationAccordianProps) => {
+    const [expandedId, setExpandedId] = useState<number | null>(0);
+
+    if (isLoading) {
+        return (
+            <div className="w-full h-full py-5 pr-6 pl-6 md:py-6 md:pr-8 md:pl-8 bg-white overflow-hidden">
+                <Skeleton variant="text" className="!w-32 !h-8 mb-8" />
+                <div className="relative ml-[34px] md:ml-[42px] mt-4 flex flex-col gap-10 w-full">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                        <div key={i} className="flex items-center gap-6 w-full relative">
+                            <Skeleton variant="circular" className="!w-3 !h-3 shrink-0 absolute -left-[1.5px]" />
+                            <Skeleton variant="text" className="!w-[60%] !h-6 ml-6" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    if (isError) {
+        return (
+            <div className="p-6 md:p-8 w-full h-full bg-white flex flex-col items-start gap-4">
+                <Alert type="error" title="Error" message={errorMessage!} />
+            </div>
+        );
+    }
+
+    if (!stations || stations.length === 0) {
+        return (
+            <div className="p-6 md:p-8 w-full h-full bg-white flex flex-col items-start gap-4">
+                <Alert type="info" title="No stations" message="No stations found for this route." />
+            </div>
+        );
+    }
+
+    const hasActiveBuses = activeBuses && activeBuses.length > 0;
+
+    return (
+        <div className={`w-full h-full py-5 pr-6 md:py-6 md:pr-8 transition-all duration-300 bg-white font-sans ${hasActiveBuses ? 'pl-16 md:pl-24' : 'pl-6 md:pl-8'}`}>
+            <h2 className="text-[20px] md:text-[22px] font-bold text-slate-900 mb-8 tracking-tight">Stations</h2>
+
+            <div className="relative ml-10 md:ml-12 mt-4">
+                <div className="absolute left-[3px] top-[14px] bottom-8 w-[2px] bg-[#fbbf24]"></div>
+
+                <div className="flex flex-col">
+                    {stations.map((station, index) => {
+                        const isExpanded = expandedId === index;
+                        const isLast = index === stations.length - 1;
+
+                        const activeBusesAtStation = activeBuses?.filter((bus) => bus.nextStationId === station.id && bus.nextSequence === station.sequence);
+
+                        return (
+                            <div key={station.sequence} className="relative flex items-start">
+                                <div className="absolute left-[-1.5px] top-[10px] w-3 h-3 rounded-full bg-[#fbbf24] shadow-[0_0_0_4px_white] z-10"></div>
+
+                                {activeBusesAtStation && activeBusesAtStation.length > 0 && (
+                                    <div className="absolute right-[calc(100%+14px)] top-[-4px] z-20 flex flex-row-reverse items-center justify-end -space-x-[26px] space-x-reverse md:-space-x-6 md:space-x-reverse">
+                                        {activeBusesAtStation.map((bus, i) => (
+                                            <div key={i} className="scale-[0.7] bg-white rounded-full shadow-[0_0_0_6px_white] shrink-0 transition-transform hover:-translate-y-0.5">
+                                                <BusIcon carPlate={bus.busPlate} alignTooltip="right" color={bus.color} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                <div className={`pl-6 md:pl-8 w-full ${isLast ? 'pb-2' : 'pb-10'}`}>
+                                    <button
+                                        onClick={() => setExpandedId(isExpanded ? null : index)}
+                                        className="text-[15px] md:text-[16px] font-bold text-slate-800 hover:text-slate-600 transition-colors text-left flex items-center justify-between w-full h-8"
+                                    >
+                                        {station.name}
+                                    </button>
+
+                                    <div
+                                        className={`grid transition-all duration-300 ease-in-out ${isExpanded ? 'grid-rows-[1fr] opacity-100 mt-2 md:mt-3' : 'grid-rows-[0fr] opacity-0 mt-0'
+                                            }`}
+                                    >
+                                        <div className="overflow-hidden">
+                                            <div className="pt-2 pr-2">
+                                                {station.nextBusArrivalTime && <BusArrivalTimeCard time={station.nextBusArrivalTime} />}
+                                                <Schedule schedule={station.schedule} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default StationAccordian;
