@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mmu_shuttle_driver/core/exceptions/LocationException.dart';
+import 'package:mmu_shuttle_driver/core/exceptions/NotificationException.dart';
 import 'package:mmu_shuttle_driver/core/utils/toast.dart';
 import 'package:mmu_shuttle_driver/core/widgets/google_map.dart';
 import 'package:mmu_shuttle_driver/features/announcement/widgets/create_announcement_dialog.dart';
@@ -64,6 +65,8 @@ class _StartRouteScreenState extends State<StartRouteScreen> {
             : 'Journey started successfully',
       );
     } on LocationException catch (e) {
+      showErrorToast(context, e.message);
+    } on NotificationException catch (e) {
       showErrorToast(context, e.message);
     } catch (e) {
       showErrorToast(context, e.toString());
