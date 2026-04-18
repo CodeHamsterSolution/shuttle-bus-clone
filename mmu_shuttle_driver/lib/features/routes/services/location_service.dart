@@ -64,8 +64,8 @@ class LocationService {
         distanceFilter: 10,
         forceLocationManager: false,
         foregroundNotificationConfig: const ForegroundNotificationConfig(
-          notificationText: "Your app is accessing location in the background",
-          notificationTitle: "Location Streaming",
+          notificationText: "Actively sharing live location with students...",
+          notificationTitle: "MMU Shuttle Bus (Driver)",
           enableWakeLock: true,
           notificationIcon: AndroidResource(name: 'launcher_icon'),
         ),

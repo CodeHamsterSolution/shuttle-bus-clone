@@ -67,68 +67,72 @@ class _SignInFormWidgetState extends State<SignInFormWidget> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20),
-        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 20,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              BusIconWidget(),
-              const SizedBox(height: 16),
-              const Text(
-                "MMU Driver",
-                style: TextStyle(fontSize: 16, color: Colors.black87),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Sign in to your account",
-                style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
-              const SizedBox(height: 12),
-              TextFieldWidget(
-                label: 'Email',
-                hintText: 'driver@mmu.edu.my',
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                validator: ValidationBuilder().email().minLength(6).build(),
-              ),
-              const SizedBox(height: 16),
-              TextFieldWidget(
-                label: 'Password',
-                hintText: '........',
-                controller: _passwordController,
-                keyboardType: TextInputType.visiblePassword,
-                shouldHide: true,
-                validator: ValidationBuilder().minLength(6).build(),
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: CustomElevatedButton(
-                  onPressed: _onSubmit,
-                  text: "Sign In",
-                  isLoading: _isLoading,
-                ),
+      child: SingleChildScrollView(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 450),
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 4),
               ),
             ],
+          ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                BusIconWidget(),
+                const SizedBox(height: 16),
+                const Text(
+                  "MMU Driver",
+                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  "Sign in to your account",
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                ),
+                const SizedBox(height: 12),
+                TextFieldWidget(
+                  label: 'Email',
+                  hintText: 'driver@mmu.edu.my',
+                  controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: ValidationBuilder().email().minLength(6).build(),
+                ),
+                const SizedBox(height: 16),
+                TextFieldWidget(
+                  label: 'Password',
+                  hintText: '........',
+                  controller: _passwordController,
+                  keyboardType: TextInputType.visiblePassword,
+                  shouldHide: true,
+                  validator: ValidationBuilder().minLength(6).build(),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: CustomElevatedButton(
+                    onPressed: _onSubmit,
+                    text: "Sign In",
+                    isLoading: _isLoading,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
+

@@ -25,7 +25,11 @@ class GoogleMapWidget extends StatelessWidget {
           ),
           onMapCreated: (controller) {
             _mapController = controller;
-            _mapController?.animateCamera(CameraUpdate.zoomIn());
+            if (stationPoints.isNotEmpty) {
+              Future.delayed(const Duration(milliseconds: 500), () {
+                _mapController?.animateCamera(CameraUpdate.zoomIn());
+              });
+            }
           },
           markers: stationPoints,
           polylines: routeLine,
