@@ -1,34 +1,29 @@
 import 'dart:io';
 
+import 'package:mmu_shuttle_driver/core/exceptions/NotificationException.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class NotificationService {
   Future<void> requestNotificationPermission() async {
     if (!Platform.isAndroid) return;
+    var status = await Permission.notification.status;
 
-    bool isGranted = false;
+    if (status.isGranted) {
+      return;
+    }
 
-    while (!isGranted) {
-      var status = await Permission.notification.status;
-
-      if (status.isGranted) {
-        isGranted = true;
-        break;
-      }
+    if (status.isDenied) {
+      status = await Permission.notification.request();
 
       if (status.isDenied) {
-        status = await Permission.notification.request();
-      }
-
-      if (status.isPermanentlyDenied) {
-        print("Permission blocked by OS. Redirecting to app settings...");
-
-        await openAppSettings();
-
-        await Future.delayed(const Duration(seconds: 3));
+        throw NotificationException("Notification permissions are denied");
       }
     }
 
-    print("Notification permission successfully granted!");
+    if (status.isPermanentlyDenied) {
+      throw NotificationException(
+        'Notification permissions are permanently denied, we cannot request permissions.',
+      );
+    }
   }
 }
