@@ -68,6 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final errorMessage = authProvider.errorMessage;
 
         // passed value
+        final id = currentSignInDriver?.id ?? -1;
         final email = currentSignInDriver?.email ?? '';
         final busPlate = currentSignInDriver?.busPlate ?? '';
 
@@ -95,8 +96,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         )
                       else ...[
                         ProfileAvatarWidget(
-                          name: 'John Doe',
-                          driverId: '123456',
+                          name: 'MMU Driver',
+                          driverId: id,
                         ),
                         const SizedBox(height: 8),
                         InformationRowWidget(label: 'Email', value: email),
