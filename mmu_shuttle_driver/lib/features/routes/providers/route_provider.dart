@@ -8,6 +8,7 @@ import 'package:mmu_shuttle_driver/core/utils/ui.dart';
 import 'package:mmu_shuttle_driver/features/routes/models/route_model.dart';
 import 'package:mmu_shuttle_driver/features/routes/models/live_ride_model.dart';
 import 'package:mmu_shuttle_driver/features/routes/services/location_service.dart';
+import 'package:mmu_shuttle_driver/features/routes/services/notification_service.dart';
 import 'package:mmu_shuttle_driver/features/routes/services/route_service.dart';
 
 class RouteProvider extends ChangeNotifier {
@@ -24,6 +25,7 @@ class RouteProvider extends ChangeNotifier {
   final _routeService = RouteService();
 
   final _locationService = LocationService();
+  final _notificationService = NotificationService();
 
   bool _isLoading = true;
   String? _errorMesssage;
@@ -95,6 +97,7 @@ class RouteProvider extends ChangeNotifier {
   Future<void> startTracking({bool isResumed = false}) async {
     Position currentLocation;
     currentLocation = await _locationService.getCurrentLocation();
+    await _notificationService.requestNotificationPermission();
 
     final startRideModel = LiveRideModel(
       routeId: selectedRoute!.id,
