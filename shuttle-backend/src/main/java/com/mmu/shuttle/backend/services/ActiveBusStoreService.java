@@ -113,9 +113,10 @@ public class ActiveBusStoreService {
 
         RouteStation physicallyReachedStation = null;
         double minDistance = Double.MAX_VALUE;
+        long maxLookaheadSequence = currentExpectedSequence + 2;
 
         for (RouteStation rs : stations) {
-            if (rs.getStation() != null && rs.getSequence() >= currentExpectedSequence) {
+            if (rs.getStation() != null && rs.getSequence() >= currentExpectedSequence && rs.getSequence() <= maxLookaheadSequence) {
                 double distance = GeoUtils.calculateDistanceInMeters(
                         newLocation.getLatitude(), newLocation.getLongitude(),
                         rs.getStation().getLatitude(), rs.getStation().getLongitude()
