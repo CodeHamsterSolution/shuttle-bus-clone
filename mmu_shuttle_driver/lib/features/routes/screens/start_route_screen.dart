@@ -138,7 +138,7 @@ class _StartRouteScreenState extends State<StartRouteScreen> {
     final totalStation = '${selectedRoute.totalStations} stations';
 
     return PopScope(
-      canPop: !_isOngoing,
+      canPop: !_isOngoing && !_isLoading,
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
