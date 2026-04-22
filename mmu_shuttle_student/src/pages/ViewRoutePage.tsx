@@ -6,9 +6,13 @@ import RouteTitleTag from "../components/RouteTitleTag";
 import StationAccordian from "../components/StationAccordian";
 import GoogleMap from "../components/GoogleMap";
 import LiveTrackingBadge from "../components/LiveTrackingBadge";
+import DraggableBottomSheet from "../components/DraggableBottomSheet";
+import MarqueeBanner from "../components/MarqueeBanner";
 import { useEffect, useState } from "react";
 import SnackBar from "../components/SnackBar";
 import type { ActiveBus } from "../interfaces/models/ActiveBus";
+import { Bus, ArrowRight } from 'lucide-react';
+import { INDICATOR_COLOR } from "../shared/constants";
 
 const ViewRoutePage = () => {
     const { id } = useParams();
@@ -101,18 +105,23 @@ const ViewRoutePage = () => {
     const routeLine = route?.routeLine || [];
     const stations = route?.stations || [];
     const isLiveTracking: boolean = activeBusses ? activeBusses.length > 0 : false;
-    const indicatorColor = "bg-gray-500";
     const routeErrorMessage = routeError?.message;
 
     return (
         <div className="flex flex-col w-full h-screen">
+            <MarqueeBanner className="py-1.5 bg-[#fef0cb] border-b border-amber-200 text-xs md:text-sm text-amber-700 shrink-0">
+                <Bus size={14} className="shrink-0" />
+                <ArrowRight size={10} className="shrink-0 text-amber-400" />
+                <span>Bus icon beside a station means it is <strong>heading to</strong> that station</span>
+            </MarqueeBanner>
+
             <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4 md:py-5 flex items-center gap-4 md:gap-6 z-10 shadow-sm relative shrink-0">
                 <BackButton text="Back to Routes" onClick={handleBackClick} />
-                <RouteTitleTag title={route?.routeName} indicatorColor={indicatorColor} isLoading={isRouteLoading} isError={isRouteError} errorMessage={routeErrorMessage} />
+                <RouteTitleTag title={route?.routeName} indicatorColor={INDICATOR_COLOR} isLoading={isRouteLoading} isError={isRouteError} errorMessage={routeErrorMessage} />
             </div>
 
             <div className="flex-1 w-full bg-slate-50 relative flex flex-col md:flex-row overflow-hidden">
-                <div className="w-full h-[45vh] md:h-full md:flex-1 relative shrink-0">
+                <div className="w-full h-full md:flex-1 relative">
                     <GoogleMap routeLine={routeLine} stations={stations} activeBuses={activeBusses} />
                     <LiveTrackingBadge
                         isLiveTracking={isLiveTracking}
@@ -122,7 +131,11 @@ const ViewRoutePage = () => {
                     />
                 </div>
 
-                <div className="flex-1 md:flex-none w-full md:w-[400px] lg:w-[480px] h-auto bg-white border-t md:border-t-0 md:border-l border-gray-200 z-10 shrink-0 md:shrink-0 shadow-[0_-4px_24px_rgb(0,0,0,0.04)] md:shadow-[-4px_0_24px_rgb(0,0,0,0.02)] overflow-y-auto">
+                <DraggableBottomSheet>
+                    <StationAccordian stations={stations} activeBuses={activeBusses} isLoading={isRouteLoading} isError={isRouteError} errorMessage={routeErrorMessage} />
+                </DraggableBottomSheet>
+
+                <div className="hidden md:block md:flex-none md:w-[400px] lg:w-[480px] bg-white md:border-l border-gray-200 z-10 md:shrink-0 shadow-[-4px_0_24px_rgb(0,0,0,0.02)] overflow-y-auto">
                     <StationAccordian stations={stations} activeBuses={activeBusses} isLoading={isRouteLoading} isError={isRouteError} errorMessage={routeErrorMessage} />
                 </div>
             </div>
