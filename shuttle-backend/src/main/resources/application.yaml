@@ -8,6 +8,11 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 jpa:
   hibernate:
     ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
@@ -20,5 +25,5 @@ jpa:
 storage:
   url: ${STORAGE_URL}
 
-jwt:
-  secret: ${SECRET_KEY}
+secret:
+  key: ${SECRET_KEY}

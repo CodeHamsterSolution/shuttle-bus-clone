@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mmu_shuttle_driver/core/exceptions/LocationException.dart';
+import 'package:mmu_shuttle_driver/core/exceptions/NotificationException.dart';
 import 'package:mmu_shuttle_driver/core/utils/toast.dart';
 import 'package:mmu_shuttle_driver/core/widgets/google_map.dart';
 import 'package:mmu_shuttle_driver/features/announcement/widgets/create_announcement_dialog.dart';
@@ -64,6 +65,8 @@ class _StartRouteScreenState extends State<StartRouteScreen> {
             : 'Journey started successfully',
       );
     } on LocationException catch (e) {
+      showErrorToast(context, e.message);
+    } on NotificationException catch (e) {
       showErrorToast(context, e.message);
     } catch (e) {
       showErrorToast(context, e.toString());
@@ -134,29 +137,32 @@ class _StartRouteScreenState extends State<StartRouteScreen> {
     final routeName = selectedRoute.routeName;
     final totalStation = '${selectedRoute.totalStations} stations';
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 10.0, top: 0, bottom: 0),
-          child: _isOngoing ? null : BackButtonWidget(onTap: _onBack),
-        ),
-      ),
-      body: Stack(
-        children: [
-          GoogleMapWidget(),
-          StartRouteCard(
-            title: routeName,
-            totalStation: totalStation,
-            isOngoing: _isOngoing,
-            onStartJourney: _onStartJourney,
-            onSendUpdate: _onSendUpdate,
-            onStopJourney: _onStopJourney,
-            isLoading: _isLoading,
+    return PopScope(
+      canPop: !_isOngoing && !_isLoading,
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 10.0, top: 0, bottom: 0),
+            child: _isOngoing ? null : BackButtonWidget(onTap: _onBack),
           ),
-        ],
+        ),
+        body: Stack(
+          children: [
+            GoogleMapWidget(),
+            StartRouteCard(
+              title: routeName,
+              totalStation: totalStation,
+              isOngoing: _isOngoing,
+              onStartJourney: _onStartJourney,
+              onSendUpdate: _onSendUpdate,
+              onStopJourney: _onStopJourney,
+              isLoading: _isLoading,
+            ),
+          ],
+        ),
       ),
     );
   }

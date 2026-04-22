@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mmu_shuttle_driver/core/authentication/token_manager.dart';
 import 'package:mmu_shuttle_driver/core/constants.dart';
@@ -55,15 +56,34 @@ class LocationService {
     Function(Position) onPositionUpdate,
     Function(dynamic) onError,
   ) {
+    LocationSettings locationSettings;
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      locationSettings = AndroidSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+        forceLocationManager: false,
+        foregroundNotificationConfig: const ForegroundNotificationConfig(
+          notificationText: "Actively sharing live location with students...",
+          notificationTitle: "MMU Shuttle Bus (Driver)",
+          enableWakeLock: true,
+          notificationIcon: AndroidResource(name: 'launcher_icon'),
+        ),
+      );
+    } else {
+      locationSettings = const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      );
+    }
+
     _positionSubscription =
-        Geolocator.getPositionStream(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.high,
-            distanceFilter: 10,
-          ),
-        ).listen((Position position) {
-          onPositionUpdate(position);
-        }, onError: onError);
+        Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+          (Position position) {
+            onPositionUpdate(position);
+          },
+          onError: onError,
+        );
   }
 
   void initializeConnection() async {

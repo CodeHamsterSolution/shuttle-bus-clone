@@ -44,12 +44,10 @@ const StationAccordian = ({ stations, activeBuses, isLoading, isError, errorMess
     const hasActiveBuses = activeBuses && activeBuses.length > 0;
 
     return (
-        <div className={`w-full h-full py-5 pr-6 md:py-6 md:pr-8 transition-all duration-300 bg-white font-sans ${hasActiveBuses ? 'pl-16 md:pl-24' : 'pl-6 md:pl-8'}`}>
+        <div className={`w-full h-full pt-5 pb-24 pr-6 md:py-6 md:pr-8 transition-all duration-300 bg-white font-sans ${hasActiveBuses ? 'pl-16 md:pl-24' : 'pl-6 md:pl-8'}`}>
             <h2 className="text-[20px] md:text-[22px] font-bold text-slate-900 mb-8 tracking-tight">Stations</h2>
 
             <div className="relative ml-10 md:ml-12 mt-4">
-                <div className="absolute left-[3px] top-[14px] bottom-8 w-[2px] bg-[#fbbf24]"></div>
-
                 <div className="flex flex-col">
                     {stations.map((station, index) => {
                         const isExpanded = expandedId === index;
@@ -59,6 +57,9 @@ const StationAccordian = ({ stations, activeBuses, isLoading, isError, errorMess
 
                         return (
                             <div key={station.sequence} className="relative flex items-start">
+                                {!isLast && (
+                                    <div className="absolute left-[4px] top-[14px] bottom-0 w-[2px] bg-[#fbbf24]"></div>
+                                )}
                                 <div className="absolute left-[-1.5px] top-[10px] w-3 h-3 rounded-full bg-[#fbbf24] shadow-[0_0_0_4px_white] z-10"></div>
 
                                 {activeBusesAtStation && activeBusesAtStation.length > 0 && (
@@ -71,7 +72,7 @@ const StationAccordian = ({ stations, activeBuses, isLoading, isError, errorMess
                                     </div>
                                 )}
 
-                                <div className={`pl-6 md:pl-8 w-full ${isLast ? 'pb-2' : 'pb-10'}`}>
+                                <div className={`pl-6 md:pl-8 w-full ${isLast ? 'pb-20' : 'pb-10'}`}>
                                     <button
                                         onClick={() => setExpandedId(isExpanded ? null : index)}
                                         className="text-[15px] md:text-[16px] font-bold text-slate-800 hover:text-slate-600 transition-colors text-left flex items-center justify-between w-full h-8"

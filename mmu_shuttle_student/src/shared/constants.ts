@@ -5,6 +5,10 @@ export const MMMU_LOCATION = { lat: 2.931944, lng: 101.655556 };
 
 // UI 
 export const SCHEDULE_VIEW_LIMIT = 8;
+export const SNAP_POINTS = [0.20, 0.30, 0.55, 0.85];
+export const DEFAULT_SNAP_INDEX = 1;
+export const INDICATOR_COLOR = "bg-gray-500";
+
 
 // URL
 export const API_URL = import.meta.env.VITE_API_URL;

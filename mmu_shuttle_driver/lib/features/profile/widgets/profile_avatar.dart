@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class ProfileAvatarWidget extends StatelessWidget {
   final String name;
-  final String driverId;
+  final int driverId;
 
   const ProfileAvatarWidget({
     super.key,
