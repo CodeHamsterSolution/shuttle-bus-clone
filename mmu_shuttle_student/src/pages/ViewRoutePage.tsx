@@ -114,7 +114,7 @@ const ViewRoutePage = () => {
             <MarqueeBanner className="py-1.5 bg-[#fef0cb] border-b border-amber-200 text-xs md:text-sm text-amber-700 shrink-0">
                 <Bus size={14} className="shrink-0" />
                 <ArrowRight size={10} className="shrink-0 text-amber-400" />
-                <span>Bus icon beside a station means it is <strong>heading to</strong> that station</span>
+                <span>Bus icon beside a station means it is <strong>arrived</strong> at that station</span>
             </MarqueeBanner>
 
             <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4 md:py-5 flex items-center gap-4 md:gap-6 z-10 shadow-sm relative shrink-0">
