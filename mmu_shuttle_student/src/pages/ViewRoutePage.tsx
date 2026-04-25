@@ -61,6 +61,8 @@ const ViewRoutePage = () => {
                     nextStationId: Number(parsedData?.nextBusStationId),
                     active: Boolean(parsedData?.active),
                     color: parsedData?.color,
+                    isAtStation: Boolean(parsedData?.isAtStation ?? parsedData?.atStation),
+                    lastVisitedStationId: parsedData?.lastVisitedStationId ?? undefined,
                 };
 
                 queryClient.setQueryData(['activeBuses', routeId], (oldData: ActiveBus[] = []) => {

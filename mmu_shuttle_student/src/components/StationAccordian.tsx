@@ -52,20 +52,63 @@ const StationAccordian = ({ stations, activeBuses, isLoading, isError, errorMess
                     {stations.map((station, index) => {
                         const isExpanded = expandedId === index;
                         const isLast = index === stations.length - 1;
-
-                        const activeBusesAtStation = activeBuses?.filter((bus) => bus.nextStationId === station.id && bus.nextSequence === station.sequence);
+                        const busesAtStation = activeBuses?.filter((bus) => {
+                            const hasLastVisited = bus.lastVisitedStationId != null;
+                            return bus.isAtStation && hasLastVisited && bus.lastVisitedStationId === station.id;
+                        });
+                        const busesInTransitFromStation = activeBuses?.filter((bus) => {
+                            const hasLastVisited = bus.lastVisitedStationId != null;
+                            return !bus.isAtStation && hasLastVisited && bus.lastVisitedStationId === station.id;
+                        });
+                        const busesHeadingToFirst = activeBuses?.filter((bus) => {
+                            const hasLastVisited = bus.lastVisitedStationId == null;
+                            return !bus.isAtStation && hasLastVisited && bus.nextStationId === station.id && bus.nextSequence == 1;
+                        });
+                        const stationBusIcons = (busesAtStation ?? []).map((bus) => ({ bus }));
 
                         return (
                             <div key={station.sequence} className="relative flex items-start">
                                 {!isLast && (
                                     <div className="absolute left-[4px] top-[14px] bottom-0 w-[2px] bg-[#fbbf24]"></div>
                                 )}
+                                {index === 0 && (
+                                    <div className="absolute left-[4px] top-[-22px] h-[22px] w-[2px] bg-[#fbbf24]"></div>
+                                )}
                                 <div className="absolute left-[-1.5px] top-[10px] w-3 h-3 rounded-full bg-[#fbbf24] shadow-[0_0_0_4px_white] z-10"></div>
 
-                                {activeBusesAtStation && activeBusesAtStation.length > 0 && (
+                                {stationBusIcons.length > 0 && (
                                     <div className="absolute right-[calc(100%+14px)] top-[-4px] z-20 flex flex-row-reverse items-center justify-end -space-x-[26px] space-x-reverse md:-space-x-6 md:space-x-reverse">
-                                        {activeBusesAtStation.map((bus, i) => (
-                                            <div key={i} className="scale-[0.7] bg-white rounded-full shadow-[0_0_0_6px_white] shrink-0 transition-transform hover:-translate-y-0.5">
+                                        {stationBusIcons.map(({ bus }) => (
+                                            <div
+                                                key={`station-${bus.id}`}
+                                                className="scale-[0.7] bg-white rounded-full shadow-[0_0_0_6px_white] shrink-0 transition-transform hover:-translate-y-0.5"
+                                            >
+                                                <BusIcon carPlate={bus.busPlate} alignTooltip="right" color={bus.color} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {busesHeadingToFirst && busesHeadingToFirst.length > 0 && index === 0 && (
+                                    <div className="absolute right-[calc(100%+14px)] top-[-34px] z-20 flex flex-row-reverse items-center justify-end -space-x-[26px] space-x-reverse md:-space-x-6 md:space-x-reverse">
+                                        {busesHeadingToFirst.map((bus) => (
+                                            <div
+                                                key={`heading-${bus.id}`}
+                                                className="scale-[0.7] bg-white rounded-full shadow-[0_0_0_6px_white] shrink-0"
+                                            >
+                                                <BusIcon carPlate={bus.busPlate} alignTooltip="right" color={bus.color} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {busesInTransitFromStation && busesInTransitFromStation.length > 0 && !isLast && (
+                                    <div className="absolute right-[calc(100%+14px)] top-[calc(50%+6px)] -translate-y-1/2 z-20 flex flex-row-reverse items-center justify-end -space-x-[26px] space-x-reverse md:-space-x-6 md:space-x-reverse">
+                                        {busesInTransitFromStation.map((bus) => (
+                                            <div
+                                                key={`transit-${bus.id}`}
+                                                className="scale-[0.7] bg-white rounded-full shadow-[0_0_0_6px_white] shrink-0 animate-pulse"
+                                            >
                                                 <BusIcon carPlate={bus.busPlate} alignTooltip="right" color={bus.color} />
                                             </div>
                                         ))}

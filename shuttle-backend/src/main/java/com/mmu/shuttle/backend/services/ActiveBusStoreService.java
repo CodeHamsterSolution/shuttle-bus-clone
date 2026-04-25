@@ -4,7 +4,6 @@ import com.mmu.shuttle.backend.caches.ActiveBusStore;
 import com.mmu.shuttle.backend.caches.RouteCache;
 import com.mmu.shuttle.backend.entities.Route;
 import com.mmu.shuttle.backend.entities.RouteStation;
-import com.mmu.shuttle.backend.entities.Station;
 import com.mmu.shuttle.backend.exceptions.ResourceNotFoundException;
 import com.mmu.shuttle.backend.models.ActiveBusModel;
 import com.mmu.shuttle.backend.models.ActiveBusRequest;
@@ -19,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ActiveBusStoreService {
@@ -109,6 +109,26 @@ public class ActiveBusStoreService {
         }
 
         List<RouteStation> stations = route.getRouteStations();
+
+        if (activeBusModel.isAtStation() && activeBusModel.getLastVisitedStationId() != null) {
+            RouteStation lastStation = stations.stream()
+                    .filter(rs -> rs.getStation() != null &&
+                            Objects.equals(rs.getStation().getId(), activeBusModel.getLastVisitedStationId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (lastStation != null) {
+                double distanceToLast = GeoUtils.calculateDistanceInMeters(
+                        newLocation.getLatitude(), newLocation.getLongitude(),
+                        lastStation.getStation().getLatitude(), lastStation.getStation().getLongitude()
+                );
+
+                if (distanceToLast > 50.0) {
+                    activeBusModel.setAtStation(false);
+                }
+            }
+        }
+
         long currentExpectedSequence = activeBusModel.getNextSequence();
 
         RouteStation physicallyReachedStation = null;
@@ -130,6 +150,10 @@ public class ActiveBusStoreService {
         }
 
         if (physicallyReachedStation != null) {
+
+            activeBusModel.setAtStation(true);
+            activeBusModel.setLastVisitedStationId(physicallyReachedStation.getStation().getId());
+
             long reachedSequence = physicallyReachedStation.getSequence();
             int targetSequence = -1;
 

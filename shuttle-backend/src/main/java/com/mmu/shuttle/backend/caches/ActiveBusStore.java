@@ -42,6 +42,8 @@ public class ActiveBusStore {
         activeBusModel.setNextBusStationId(nextStationId);
         activeBusModel.setNextSequence(1);
         activeBusModel.setColor(StyleUtils.getBusIconColor(myTicket));
+        activeBusModel.setAtStation(false);
+        activeBusModel.setLastVisitedStationId(null);
 
         LocationModel locationModel = new LocationModel();
         locationModel.setLatitude(latitude);
@@ -65,7 +67,9 @@ public class ActiveBusStore {
                 .findFirst()
                 .orElse(null);
 
-        busToRemove.setActive(false);
+        if(busToRemove != null) {
+            busToRemove.setActive(false);
+        }
 
         activeBusModels.remove(busToRemove);
 

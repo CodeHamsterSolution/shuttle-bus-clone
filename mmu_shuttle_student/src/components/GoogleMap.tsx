@@ -4,10 +4,14 @@ import type { GoogleMapProps } from "../interfaces/props/GoogleMapProps";
 import MapPolyline from "./MapPolyline";
 import BusIcon from "./BusIcon";
 import StationPin from "./StationPin";
-import { MMMU_LOCATION } from "../shared/constants";
+import GoogleMapLoading from "./GoogleMapLoading";
 
 const GoogleMap = ({ routeLine, activeBuses, stations }: GoogleMapProps) => {
-    const startingPoint = routeLine?.[0] || MMMU_LOCATION;
+    const startingPoint = routeLine?.[0];
+
+    if (!startingPoint) {
+        return <GoogleMapLoading />;
+    }
     return <>
         <Map
             defaultZoom={15}
