@@ -115,6 +115,8 @@ const ViewRoutePage = () => {
                 <Bus size={14} className="shrink-0" />
                 <ArrowRight size={10} className="shrink-0 text-amber-400" />
                 <span>Bus icon beside a station means it has <strong>arrived</strong> at that station</span>
+                <span className="mx-2 text-amber-300">•</span>
+                <span>Blinking bus icon means it is <strong>in transit</strong> to the next station</span>
             </MarqueeBanner>
 
             <div className="bg-white border-b border-gray-200 px-4 md:px-8 py-4 md:py-5 flex items-center gap-4 md:gap-6 z-10 shadow-sm relative shrink-0">
