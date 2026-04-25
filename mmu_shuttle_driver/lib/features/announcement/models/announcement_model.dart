@@ -25,4 +25,22 @@ class AnnouncementModel {
       createdAt: DateTime.tryParse(json['createdAt'] ?? '') ?? DateTime.now(),
     );
   }
+
+  AnnouncementModel copyWith({
+    int? id,
+    String? title,
+    String? description,
+    DateTime? createdAt,
+    bool? isPinned,
+    String? fileName,
+  }) {
+    return AnnouncementModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      createdAt: createdAt ?? this.createdAt,
+      isPinned: isPinned ?? this.isPinned,
+      fileName: fileName ?? this.fileName,
+    );
+  }
 }
