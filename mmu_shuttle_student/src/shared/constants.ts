@@ -1,6 +1,7 @@
 // Google Maps
 export const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 export const GOOGLE_MAPS_ID = import.meta.env.VITE_GOOGLE_MAPS_ID;
+export const MMU_LOCATION = { lat: 2.9210578523559745, lng: 101.64167145370148 };
 
 // UI 
 export const SCHEDULE_VIEW_LIMIT = 8;

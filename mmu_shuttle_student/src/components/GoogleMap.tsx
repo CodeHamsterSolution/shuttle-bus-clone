@@ -1,21 +1,32 @@
-import { Map, AdvancedMarker } from "@vis.gl/react-google-maps";
-import { GOOGLE_MAPS_ID } from "../shared/constants";
+import { Map, AdvancedMarker, useMap } from "@vis.gl/react-google-maps";
+import { GOOGLE_MAPS_ID, MMU_LOCATION } from "../shared/constants";
 import type { GoogleMapProps } from "../interfaces/props/GoogleMapProps";
 import MapPolyline from "./MapPolyline";
 import BusIcon from "./BusIcon";
 import StationPin from "./StationPin";
 import GoogleMapLoading from "./GoogleMapLoading";
+import { useEffect } from "react";
 
 const GoogleMap = ({ routeLine, activeBuses, stations }: GoogleMapProps) => {
-    const startingPoint = routeLine?.[0];
+    const map = useMap(GOOGLE_MAPS_ID);
 
-    if (!startingPoint) {
+    useEffect(() => {
+        if (!map || !routeLine || routeLine.length === 0) return;
+
+        const bounds = new window.google.maps.LatLngBounds();
+
+        routeLine.forEach((point) => bounds.extend(point));
+
+        map.fitBounds(bounds);
+    }, [map, routeLine]);
+
+    if (!routeLine) {
         return <GoogleMapLoading />;
     }
     return <>
         <Map
-            defaultZoom={15}
-            defaultCenter={startingPoint}
+            defaultZoom={14.5}
+            defaultCenter={MMU_LOCATION}
             mapId={GOOGLE_MAPS_ID}
             disableDefaultUI={true}
             gestureHandling="greedy"
