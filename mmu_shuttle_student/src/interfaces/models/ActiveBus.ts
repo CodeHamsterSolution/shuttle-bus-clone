@@ -8,4 +8,6 @@ export interface ActiveBus {
     nextStationId: number;
     active: boolean;
     color: string;
+    isAtStation: boolean;
+    lastVisitedStationId?: number;
 }

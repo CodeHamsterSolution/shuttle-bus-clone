@@ -47,13 +47,32 @@ class AnnouncementProvider extends ChangeNotifier {
       formData,
     );
 
-    _announcements.insert(0, savedAnnouncement);
+    _announcements.add(savedAnnouncement);
+
+    _applySort();
+
     notifyListeners();
+  }
+
+  void _applySort() {
+    _announcements.sort((a, b) {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return b.createdAt.compareTo(a.createdAt);
+    });
   }
 
   Future<void> togglePin(int id) async {
     await _announcementService.togglePin(id);
-    fetchAnnouncements();
+    final index = _announcements.indexWhere((a) => a.id == id);
+    if (index != -1) {
+      final current = _announcements[index];
+      _announcements[index] = current.copyWith(isPinned: !current.isPinned);
+      _applySort();
+      notifyListeners();
+    } else {
+      throw Exception("Local State Corrupted");
+    }
   }
 
   Future<void> fetchAnnouncements() async {

@@ -78,6 +78,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
               }
 
               return SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 100),
                 child: Column(
                   children: [
                     HeaderWidget(
@@ -112,7 +113,6 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
                         ],
                       );
                     }),
-                    if (isLoading == true) const CircularProgressIndicator(),
                   ],
                 ),
               );

@@ -16,4 +16,6 @@ public class ActiveBusModel {
     private int nextSequence;
     private boolean active = true;
     private String color;
+    private boolean isAtStation;
+    private Long lastVisitedStationId;
 }

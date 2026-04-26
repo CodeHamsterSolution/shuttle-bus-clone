@@ -42,6 +42,8 @@ export const mapActiveBusResponseToActiveBusModel = (apiData: any): ActiveBus =>
         nextSequence: apiData?.nextSequence,
         nextStationId: apiData?.nextBusStationId,
         active: apiData?.active,
-        color: apiData?.color
+        color: apiData?.color,
+        isAtStation: apiData?.atStation,
+        lastVisitedStationId: apiData?.lastVisitedStationId 
     };
 }
