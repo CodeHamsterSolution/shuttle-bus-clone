@@ -53,16 +53,16 @@ const StationAccordian = ({ stations, activeBuses, isLoading, isError, errorMess
                         const isExpanded = expandedId === index;
                         const isLast = index === stations.length - 1;
                         const busesAtStation = activeBuses?.filter((bus) => {
-                            const hasLastVisited = bus.lastVisitedStationId != null;
-                            return bus.isAtStation && hasLastVisited && bus.lastVisitedStationId === station.id;
+                            const hasLastVisited = bus.lastVisitedRouteStationId != null;
+                            return bus.isAtStation && hasLastVisited && bus.lastVisitedRouteStationId === station.id;
                         });
                         const busesInTransitFromStation = activeBuses?.filter((bus) => {
-                            const hasLastVisited = bus.lastVisitedStationId != null;
-                            return !bus.isAtStation && hasLastVisited && bus.lastVisitedStationId === station.id;
+                            const hasLastVisited = bus.lastVisitedRouteStationId != null;
+                            return !bus.isAtStation && hasLastVisited && bus.lastVisitedRouteStationId === station.id;
                         });
                         const busesHeadingToFirst = activeBuses?.filter((bus) => {
-                            const hasLastVisited = bus.lastVisitedStationId == null;
-                            return !bus.isAtStation && hasLastVisited && bus.nextStationId === station.id && bus.nextSequence == 1;
+                            const hasLastVisited = bus.lastVisitedRouteStationId == null;
+                            return !bus.isAtStation && hasLastVisited && bus.nextRouteStationId === station.id && bus.nextSequence == 1;
                         });
                         const stationBusIcons = (busesAtStation ?? []).map((bus) => ({ bus }));
 
@@ -94,7 +94,7 @@ const StationAccordian = ({ stations, activeBuses, isLoading, isError, errorMess
                                         {busesHeadingToFirst.map((bus) => (
                                             <div
                                                 key={`heading-${bus.id}`}
-                                                className="scale-[0.7] bg-white rounded-full shadow-[0_0_0_6px_white] shrink-0"
+                                                className="scale-[0.7] bg-white rounded-full shadow-[0_0_0_6px_white] shrink-0 animate-pulse"
                                             >
                                                 <BusIcon carPlate={bus.busPlate} alignTooltip="right" color={bus.color} />
                                             </div>

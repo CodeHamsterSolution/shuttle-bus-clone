@@ -42,7 +42,7 @@ public class RouteModelMapper {
 
             Schedule stationSchedule = (stationQueue != null) ? stationQueue.poll() : null;
 
-            return toStationDetailResponse(station, stationSchedule, sequence);
+            return toStationDetailResponse(routeStation.getId(), station, stationSchedule, sequence);
         }).toList();
 
         routeDetailResponse.setStationDetailResponse(stationDetailResponses);
@@ -52,9 +52,9 @@ public class RouteModelMapper {
         return routeDetailResponse;
     }
 
-    public StationDetailResponse toStationDetailResponse(Station station, Schedule schedule, int sequence) {
+    public StationDetailResponse toStationDetailResponse(Long routeStationId, Station station, Schedule schedule, int sequence) {
         StationDetailResponse stationDetailResponse = new StationDetailResponse();
-        stationDetailResponse.setId(station.getId());
+        stationDetailResponse.setId(routeStationId);
         stationDetailResponse.setName(station.getName());
         stationDetailResponse.setSequence(sequence);
 

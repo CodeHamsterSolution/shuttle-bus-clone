@@ -5,9 +5,9 @@ export interface ActiveBus {
     busPlate: string;
     location: Location;
     nextSequence: number;
-    nextStationId: number;
+    nextRouteStationId: number;
     active: boolean;
     color: string;
     isAtStation: boolean;
-    lastVisitedStationId?: number;
+    lastVisitedRouteStationId?: number;
 }
