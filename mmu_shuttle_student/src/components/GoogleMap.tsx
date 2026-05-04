@@ -20,7 +20,7 @@ const GoogleMap = ({ routeLine, activeBuses, stations }: GoogleMapProps) => {
         map.fitBounds(bounds);
     }, [map, routeLine]);
 
-    if (!routeLine) {
+    if (!routeLine || routeLine.length === 0) {
         return <GoogleMapLoading />;
     }
     return <>

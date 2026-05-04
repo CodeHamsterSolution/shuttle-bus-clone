@@ -51,13 +51,13 @@ public class ActiveBusStoreService {
         Route route = routeCache.getRoute(routeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Route with id " + routeId + " is not found in cache"));
 
-        Long nextStationId = route.getRouteStations().stream()
+        Long nextRouteStationId = route.getRouteStations().stream()
                 .filter(station -> 1 == station.getSequence())
                 .findFirst()
-                .map(station -> station.getStation().getId())
+                .map(RouteStation::getId)
                 .orElse(null);
 
-        if(nextStationId == null){
+        if(nextRouteStationId == null){
             throw new ResourceNotFoundException("Next Station is Unknown");
         }
 
@@ -66,7 +66,7 @@ public class ActiveBusStoreService {
             throw new ResourceNotFoundException("Location is null");
         }
 
-        ActiveBusModel activeBusModel = activeBusStore.addActiveBus(routeId, busPlate, locationModel.getLongitude(), locationModel.getLatitude(), nextStationId);
+        ActiveBusModel activeBusModel = activeBusStore.addActiveBus(routeId, busPlate, locationModel.getLongitude(), locationModel.getLatitude(), nextRouteStationId);
         simpMessagingTemplate.convertAndSend("/routes/active_buses/" + routeId, activeBusModel);
         return activeBusModel;
     }
@@ -104,16 +104,16 @@ public class ActiveBusStoreService {
     }
 
     private void checkAndAdvanceStation(Route route, ActiveBusModel activeBusModel, LocationModel newLocation) {
-        if (route == null || activeBusModel == null || activeBusModel.getNextBusStationId() == null) {
+        if (route == null || activeBusModel == null || activeBusModel.getNextBusRouteStationId() == null) {
             return;
         }
 
         List<RouteStation> stations = route.getRouteStations();
 
-        if (activeBusModel.isAtStation() && activeBusModel.getLastVisitedStationId() != null) {
+        if (activeBusModel.isAtStation() && activeBusModel.getLastVisitedRouteStationId() != null) {
             RouteStation lastStation = stations.stream()
                     .filter(rs -> rs.getStation() != null &&
-                            Objects.equals(rs.getStation().getId(), activeBusModel.getLastVisitedStationId()))
+                            Objects.equals(rs.getId(), activeBusModel.getLastVisitedRouteStationId()))
                     .findFirst()
                     .orElse(null);
 
@@ -152,7 +152,7 @@ public class ActiveBusStoreService {
         if (physicallyReachedStation != null) {
 
             activeBusModel.setAtStation(true);
-            activeBusModel.setLastVisitedStationId(physicallyReachedStation.getStation().getId());
+            activeBusModel.setLastVisitedRouteStationId(physicallyReachedStation.getId());
 
             long reachedSequence = physicallyReachedStation.getSequence();
             int targetSequence = -1;
@@ -169,16 +169,16 @@ public class ActiveBusStoreService {
             activeBusModel.setNextSequence(targetSequence);
 
             if (targetSequence == -1) {
-                activeBusModel.setNextBusStationId(null);
+                activeBusModel.setNextBusRouteStationId(null);
             } else {
-                Long targetStationId = null;
+                Long targetRouteStationId = null;
                 for (RouteStation rs : stations) {
                     if (rs.getSequence() == targetSequence) {
-                        targetStationId = rs.getStation().getId();
+                        targetRouteStationId = rs.getId();
                         break;
                     }
                 }
-                activeBusModel.setNextBusStationId(targetStationId);
+                activeBusModel.setNextBusRouteStationId(targetRouteStationId);
             }
 
         }

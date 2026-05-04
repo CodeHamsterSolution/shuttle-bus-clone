@@ -58,11 +58,11 @@ const ViewRoutePage = () => {
                         lng: Number(parsedData?.location?.longitude)
                     },
                     nextSequence: Number(parsedData?.nextSequence),
-                    nextStationId: Number(parsedData?.nextBusStationId),
+                    nextRouteStationId: Number(parsedData?.nextBusRouteStationId),
                     active: Boolean(parsedData?.active),
                     color: parsedData?.color,
                     isAtStation: Boolean(parsedData?.isAtStation ?? parsedData?.atStation),
-                    lastVisitedStationId: parsedData?.lastVisitedStationId ?? undefined,
+                    lastVisitedRouteStationId: parsedData?.lastVisitedRouteStationId ?? undefined,
                 };
 
                 queryClient.setQueryData(['activeBuses', routeId], (oldData: ActiveBus[] = []) => {

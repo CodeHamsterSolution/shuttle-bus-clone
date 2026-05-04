@@ -20,7 +20,7 @@ public class ActiveBusStore {
     private final Map<Long, Integer> routeTicketDispenser = new ConcurrentHashMap<>();
     private final AtomicLong currentActiveBusId = new AtomicLong(1L);
 
-    public ActiveBusModel addActiveBus(Long routeId, String busPlate, double longitude, double latitude, Long nextStationId) {
+    public ActiveBusModel addActiveBus(Long routeId, String busPlate, double longitude, double latitude, Long nextRouteStationId) {
 
         boolean busExists = activeBuses.values().stream()
                 .flatMap(List::stream)
@@ -39,11 +39,11 @@ public class ActiveBusStore {
         activeBusModel.setId(activeBusId);
         activeBusModel.setBusPlate(busPlate);
         activeBusModel.setRouteId(routeId);
-        activeBusModel.setNextBusStationId(nextStationId);
+        activeBusModel.setNextBusRouteStationId(nextRouteStationId);
         activeBusModel.setNextSequence(1);
         activeBusModel.setColor(StyleUtils.getBusIconColor(myTicket));
         activeBusModel.setAtStation(false);
-        activeBusModel.setLastVisitedStationId(null);
+        activeBusModel.setLastVisitedRouteStationId(null);
 
         LocationModel locationModel = new LocationModel();
         locationModel.setLatitude(latitude);

@@ -12,10 +12,10 @@ public class ActiveBusModel {
     private Long routeId;
     private String busPlate;
     private LocationModel location;
-    private Long nextBusStationId;
+    private Long nextBusRouteStationId;
     private int nextSequence;
     private boolean active = true;
     private String color;
     private boolean isAtStation;
-    private Long lastVisitedStationId;
+    private Long lastVisitedRouteStationId;
 }
